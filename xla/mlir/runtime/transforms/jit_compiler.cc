@@ -48,6 +48,7 @@ limitations under the License.
 #include "xla/mlir/runtime/ir/rt_ops.h"
 #include "xla/mlir/runtime/transforms/compiler.h"
 #include "xla/mlir/runtime/transforms/passes.h"
+#include "xla/service/llvm_ir/llvm_util.h"
 
 namespace xla {
 namespace runtime {
@@ -422,10 +423,9 @@ MakeOptimizingTransformerForJit(llvm::TargetMachine* targetMachine) {
   if (!llvm_module)
     return compiler->Error("failed to translate module to LLVM IR");
 
-  const bool embed_ir_in_executable = compiler->options.embed_ir_in_executable;
-  std::string ir_module_string;
+  const bool embed_ir_in_executable = compiler->options().embed_ir_in_executable;
   if (embed_ir_in_executable) {
-    ir_module_string = llvm_ir::DumpToString(llvm_module.get());
+	compiler->set_ir_module_string(llvm_ir::DumpToString(llvm_module.get()));
   }
 
   // Compile input module to the native function.
@@ -445,13 +445,9 @@ MakeOptimizingTransformerForJit(llvm::TargetMachine* targetMachine) {
   for (unsigned i = 0; i < exported.size(); ++i)
     functions[i].fptr = (*engine)->exported(i);
 
-  auto executable = Executable(compiler->name(), std::move(memory_mapper),
+  return Executable(compiler->name(), std::move(memory_mapper),
                     std::move(*engine), std::move(functions), specialization,
                     time_to_compile);
-  if (embed_ir_in_executable) {
-	executable->set_ir_module_string(ir_module_string);
-  }
-  return executable;
 }
 
 // TODO(ezhulenev): Currently it's possible to specialize only one function. It

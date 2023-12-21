@@ -428,7 +428,7 @@ runtime::JitExecutable::Options GetXlaRuntimeJitExecutableOptions(
       };
   opts.compiler.calling_convention = runtime::ResultsToOutsCallingConvention(
       FlattenTuplesAndBufferizeTypeConverter());
-  opts.embed_ir_in_executable = module.config().debug_options().xla_embed_ir_in_executable();
+  opts.compiler.embed_ir_in_executable = module.config().debug_options().xla_embed_ir_in_executable();
   return opts;
 }
 
@@ -1514,12 +1514,9 @@ StatusOr<std::unique_ptr<XlaRuntimeCpuExecutable>> GetXlaRuntimeCpuExecutable(
                          jit_executable.status().message());
   }
 
-  std::string ir_module = jit_executable->get_ir_module_string();
-  auto excecutable = std::make_unique<XlaRuntimeCpuExecutable>(
+  return std::make_unique<XlaRuntimeCpuExecutable>(
       std::make_unique<runtime::JitExecutable>(std::move(*jit_executable)),
       xla_framework_mapping);
-  executable->set_ir_module_string(ir_module);
-  return executable
 }
 }  // namespace
 
