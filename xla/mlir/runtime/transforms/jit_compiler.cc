@@ -422,6 +422,13 @@ MakeOptimizingTransformerForJit(llvm::TargetMachine* targetMachine) {
   if (!llvm_module)
     return compiler->Error("failed to translate module to LLVM IR");
 
+  const bool embed_ir_in_executable =
+      module->config().debug_options().xla_embed_ir_in_executable();
+  std::string ir_module_string;
+  if (embed_ir_in_executable) {
+    ir_module_string = llvm_ir::DumpToString(llvm_module.get());
+  }
+
   // Compile input module to the native function.
   auto engine = ExecutionEngine::CreateFromModule(
       std::move(llvm_ctx), std::move(llvm_module), engine_options, exported);
@@ -439,9 +446,13 @@ MakeOptimizingTransformerForJit(llvm::TargetMachine* targetMachine) {
   for (unsigned i = 0; i < exported.size(); ++i)
     functions[i].fptr = (*engine)->exported(i);
 
-  return Executable(compiler->name(), std::move(memory_mapper),
+  auto executable = Executable(compiler->name(), std::move(memory_mapper),
                     std::move(*engine), std::move(functions), specialization,
                     time_to_compile);
+  if (embed_ir_in_executable) {
+	executable->set_ir_module_string(ir_module_string);
+  }
+  return executable;
 }
 
 // TODO(ezhulenev): Currently it's possible to specialize only one function. It
