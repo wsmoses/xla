@@ -422,8 +422,7 @@ MakeOptimizingTransformerForJit(llvm::TargetMachine* targetMachine) {
   if (!llvm_module)
     return compiler->Error("failed to translate module to LLVM IR");
 
-  const bool embed_ir_in_executable =
-      module->config().debug_options().xla_embed_ir_in_executable();
+  const bool embed_ir_in_executable = compiler->options.embed_ir_in_executable;
   std::string ir_module_string;
   if (embed_ir_in_executable) {
     ir_module_string = llvm_ir::DumpToString(llvm_module.get());

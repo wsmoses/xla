@@ -107,6 +107,8 @@ class JitCompiler {
 
     // How much verification would you like to do?
     int verification_level = 0;
+    
+    bool embed_ir_in_executable;
   };
 
   // Instantiates compiler from the serialized mlir source.
@@ -169,6 +171,14 @@ class JitCompiler {
     return exported_[ordinal];
   }
 
+  void set_ir_module_string(std::string mod_string) {
+    ir_module_string_ = mod_string;
+  }
+
+  std::string get_ir_module_string() const {
+    return ir_module_string_;
+  }
+
  private:
   JitCompiler(Options opts, std::string_view mlir_module);
   JitCompiler(Options opts, mlir::ModuleOp mlir_module);
@@ -195,6 +205,7 @@ class JitCompiler {
   std::vector<mlir::FunctionOpInterface> exported_;  // empty if failed to parse
 
   bool specialized_;
+  std::string ir_module_string_;
 };
 
 // Adds "rt.export" with ordinal 0 to the "main" function in `module`.
