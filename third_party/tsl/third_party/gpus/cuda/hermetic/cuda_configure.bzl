@@ -174,8 +174,8 @@ def _compute_capabilities(repository_ctx):
 
     return capabilities
 
-def _compute_cuda_extra_copts(compute_capabilities):
-    copts = ["--no-cuda-include-ptx=all"]
+def _compute_cuda_extra_copts(compute_capabilities, is_clang):
+    copts = ["--no-cuda-include-ptx=all"] if is_clang else []
     for capability in compute_capabilities:
         if capability.startswith("compute_"):
             capability = capability.replace("compute_", "sm_")
@@ -270,7 +270,10 @@ def _setup_toolchains(repository_ctx, cc, cuda_version):
         cuda_defines["%{cuda_nvcc_files}"] = "[]"
         nvcc_relative_path = ""
     else:
-        cuda_defines["%{cuda_toolkit_path}"] = repository_ctx.attr.nvcc_binary.workspace_root
+        if cc.endswith("clang"):
+            cuda_defines["%{cuda_toolkit_path}"] = repository_ctx.attr.nvcc_binary.workspace_root
+        else:
+            cuda_defines["%{cuda_toolkit_path}"] = ""
         cuda_defines["%{cuda_nvcc_files}"] = "if_cuda([\"@{nvcc_archive}//:bin\", \"@{nvcc_archive}//:nvvm\"])".format(
             nvcc_archive = repository_ctx.attr.nvcc_binary.repo_name,
         )
@@ -278,7 +281,12 @@ def _setup_toolchains(repository_ctx, cc, cuda_version):
             repository_ctx.attr.nvcc_binary.workspace_root,
             repository_ctx.attr.nvcc_binary.name,
         )
-    cuda_defines["%{compiler}"] = "clang"
+    if cc.endswith("clang"):
+        cuda_defines["%{compiler}"] = "clang"
+        cuda_defines["%{extra_no_canonical_prefixes_flags}"] = ""
+    else:
+        cuda_defines["%{compiler}"] = "unknown"
+        cuda_defines["%{extra_no_canonical_prefixes_flags}"] = "\"-fno-canonical-system-headers\""
     cuda_defines["%{host_compiler_prefix}"] = "/usr/bin"
     cuda_defines["%{linker_bin_path}"] = ""
     cuda_defines["%{extra_no_canonical_prefixes_flags}"] = ""
@@ -309,7 +317,7 @@ def _setup_toolchains(repository_ctx, cc, cuda_version):
             "%{cuda_version}": cuda_version,
             "%{nvcc_path}": nvcc_relative_path,
             "%{host_compiler_path}": str(cc),
-            "%{use_clang_compiler}": "True",
+            "%{use_clang_compiler}": cc.endswith("clang"),
         }
         repository_ctx.template(
             "crosstool/clang/bin/crosstool_wrapper_driver_is_not_gcc",
@@ -398,6 +406,7 @@ def _create_dummy_repository(repository_ctx):
 def _create_local_cuda_repository(repository_ctx):
     """Creates the repository containing files set up to build with CUDA."""
     cuda_config = _get_cuda_config(repository_ctx)
+    cc = _find_cc(repository_ctx)
 
     # Set up BUILD file for cuda/
     repository_ctx.template(
@@ -407,6 +416,7 @@ def _create_local_cuda_repository(repository_ctx):
             "%{cuda_is_configured}": "True",
             "%{cuda_extra_copts}": _compute_cuda_extra_copts(
                 cuda_config.compute_capabilities,
+                cc.endswith("clang"),
             ),
             "%{cuda_gpu_architectures}": str(cuda_config.compute_capabilities),
             "%{cuda_version}": cuda_config.cuda_version,
@@ -424,7 +434,6 @@ def _create_local_cuda_repository(repository_ctx):
     )
 
     # Set up crosstool/
-    cc = _find_cc(repository_ctx)
     _setup_toolchains(repository_ctx, cc, cuda_config.cuda_version)
 
     # Set up cuda_config.h, which is used by
