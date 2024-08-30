@@ -294,6 +294,7 @@ def _setup_toolchains(repository_ctx, cc, cuda_version):
     cuda_defines["%{cxx_builtin_include_directories}"] = to_list_of_strings(
         host_compiler_includes,
     )
+    print("is_nvcc_and_clang=", is_nvcc_and_clang)
 
     if not is_nvcc_and_clang:
         cuda_defines["%{host_compiler_path}"] = str(cc)
