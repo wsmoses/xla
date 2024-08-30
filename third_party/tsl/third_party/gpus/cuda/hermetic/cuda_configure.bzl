@@ -322,7 +322,6 @@ def _setup_toolchains(repository_ctx, cc, cuda_version):
             "%{use_clang_compiler}": cc.endswith("clang"),
         }
         print("entered else")
-        assert False
         repository_ctx.template(
             "crosstool/clang/bin/crosstool_wrapper_driver_is_not_gcc",
             repository_ctx.attr.crosstool_wrapper_driver_is_not_gcc_tpl,
