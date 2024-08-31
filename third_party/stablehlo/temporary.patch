@@ -387,3 +387,19 @@ diff --ruN a/stablehlo/stablehlo/transforms/StablehloCreateCompatibilityExpander
 +      (StableHLO_NegOp (StableHLO_MulOp $tan, $tanh)))
 +  )>;
 
+diff --git a/BUILD.bazel b/BUILD.bazel
+index dec78d1a..d5af988d 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -910,9 +910,7 @@ cc_library(
+         ":stablehlo_serialization",
+         ":version",
+         "@llvm-project//llvm:Support",
+-        "@llvm-project//mlir:CAPIIR",
+-        "@llvm-project//mlir:IR",
+-        "@llvm-project//mlir:Support",
++        "@llvm-project//mlir:CAPIIRObjects",
+     ],
+ )
+ 
+
