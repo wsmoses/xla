@@ -391,7 +391,7 @@ diff --git a/BUILD.bazel b/BUILD.bazel
 index 0fb1b7cd..7c21b9fb 100644
 --- a/BUILD.bazel
 +++ b/BUILD.bazel
-@@ -918,17 +918,10 @@ cc_library(
+@@ -918,17 +918,12 @@ cc_library(
      hdrs = STABLEHLO_CAPI_HEADERS,
      strip_include_prefix = ".",
      deps = [
@@ -399,8 +399,8 @@ index 0fb1b7cd..7c21b9fb 100644
 -        ":reference_configuration",
          ":stablehlo_ops",
          ":stablehlo_passes",
--        ":stablehlo_portable_api",
--        ":stablehlo_serialization",
+         ":stablehlo_portable_api",
+         ":stablehlo_serialization",
 -        ":version",
          "@llvm-project//llvm:Support",
 -        "@llvm-project//mlir:CAPIIR",
