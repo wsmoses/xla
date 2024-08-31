@@ -388,10 +388,10 @@ diff --ruN a/stablehlo/stablehlo/transforms/StablehloCreateCompatibilityExpander
 +  )>;
 
 diff --git a/BUILD.bazel b/BUILD.bazel
-index dec78d1a..b19715c4 100644
+index 0fb1b7cd..c6bba5f5 100644
 --- a/BUILD.bazel
 +++ b/BUILD.bazel
-@@ -941,9 +941,7 @@ cc_library(
+@@ -926,9 +926,7 @@ cc_library(
          ":stablehlo_serialization",
          ":version",
          "@llvm-project//llvm:Support",
@@ -401,5 +401,5 @@ index dec78d1a..b19715c4 100644
 +        "@llvm-project//mlir:CAPIIRObjects",
      ],
      alwayslink = True,
- ) 
+ )
 
