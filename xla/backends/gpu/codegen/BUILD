@@ -311,6 +311,7 @@ cc_library(
         ":sort",
         "//xla:shape_util",
         "//xla/backends/gpu/codegen/emitters:concatenate",
+        "//xla/backends/gpu/codegen/emitters:overlapping_slices_fusion",
         "//xla/backends/gpu/codegen/emitters:in_place_dynamic_update_slice",
         "//xla/backends/gpu/codegen/emitters:loop",
         "//xla/backends/gpu/codegen/emitters:reduction",

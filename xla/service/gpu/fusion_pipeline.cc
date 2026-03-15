@@ -23,6 +23,7 @@ limitations under the License.
 #include "xla/backends/gpu/transforms/priority_fusion.h"
 #include "xla/backends/gpu/transforms/sort_iota_fusion.h"
 #include "xla/backends/gpu/transforms/variadic_op_splitter.h"
+#include "xla/backends/gpu/transforms/overlapping_slices_shared_memory_rewriter.h"
 #include "xla/hlo/ir/hlo_computation.h"
 #include "xla/hlo/pass/hlo_pass_fix.h"
 #include "xla/hlo/pass/hlo_pass_pipeline.h"
@@ -68,6 +69,9 @@ HloPassPipeline FusionPipeline(
   fusion.AddPass<PriorityFusion>(thread_pool, gpu_device_info, alias_info,
                                  std::move(cost_analysis_options),
                                  mlir_context);
+
+  // Convert appropriate kLoop fusions to kCustom fusions for overlapping slices caching
+  fusion.AddPass<OverlappingSlicesSharedMemoryRewriter>();
 
   // Running CSE affects how many users an op has. This plays a role in what
   // we detect as a tiled transpose fusion.

@@ -3532,3 +3532,33 @@ xla_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "overlapping_slices_shared_memory_rewriter",
+    srcs = ["overlapping_slices_shared_memory_rewriter.cc"],
+    hdrs = ["overlapping_slices_shared_memory_rewriter.h"],
+    deps = [
+        "//xla/hlo/ir:hlo",
+        "//xla/hlo/pass:hlo_pass",
+        "//xla/service/gpu:backend_configs_cc",
+        "@com_google_absl//absl/container:flat_hash_set",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/status:statusor",
+        "@com_google_absl//absl/strings:string_view",
+        "//xla/tsl/platform:errors",
+    ],
+)
+
+xla_cc_test(
+    name = "overlapping_slices_shared_memory_rewriter_test",
+    srcs = ["overlapping_slices_shared_memory_rewriter_test.cc"],
+    deps = [
+        ":overlapping_slices_shared_memory_rewriter",
+        "//xla/hlo/ir:hlo",
+        "//xla/hlo/testlib:hlo_hardware_independent_test_base",
+        "//xla/service/gpu:backend_configs_cc",
+        "//xla/tsl/platform:statusor",
+        "@com_google_absl//absl/strings:string_view",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

@@ -1568,6 +1568,7 @@ cc_library(
         "//xla/backends/gpu/transforms:priority_fusion",
         "//xla/backends/gpu/transforms:sort_iota_fusion",
         "//xla/backends/gpu/transforms:variadic_op_splitter",
+        "//xla/backends/gpu/transforms:overlapping_slices_shared_memory_rewriter",
         "//xla/hlo/ir:hlo",
         "//xla/hlo/pass:hlo_pass",
         "//xla/hlo/pass:hlo_pass_pipeline",

@@ -25,6 +25,7 @@ limitations under the License.
 #include "xla/backends/gpu/codegen/emitters/concatenate.h"
 #include "xla/backends/gpu/codegen/emitters/in_place_dynamic_update_slice.h"
 #include "xla/backends/gpu/codegen/emitters/loop.h"
+#include "xla/backends/gpu/codegen/emitters/overlapping_slices.h"
 #include "xla/backends/gpu/codegen/emitters/reduction.h"
 #include "xla/backends/gpu/codegen/emitters/scatter.h"
 #include "xla/backends/gpu/codegen/emitters/transpose.h"
@@ -93,6 +94,9 @@ std::unique_ptr<FusionInterface> GetFusionEmitter(
             dynamic_cast<const HloFusionInfo*>(&fusion_info);
         return std::make_unique<DynamicSliceFusion>(
             analysis, hlo_fusion_info->GetCallGraph());
+      }
+      if (config_name == "__overlapping_slices") {
+        return std::make_unique<OverlappingSlicesFusion>(analysis);
       }
       return std::make_unique<CustomFusion>();
     }

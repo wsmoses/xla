@@ -130,6 +130,19 @@ cc_library(
 )
 
 xla_cc_test(
+    name = "overlapping_slices_test",
+    srcs = ["overlapping_slices_test.cc"],
+    deps = [
+        ":emitter_base",
+        ":overlapping_slices_fusion",
+        "//xla/hlo/ir:hlo",
+        "//xla/hlo/testlib:hlo_hardware_independent_test_base",
+        "//xla/service/gpu:gpu_device_info_for_tests",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+xla_cc_test(
     name = "emitter_base_test",
     srcs = ["emitter_base_test.cc"],
     deps = [
@@ -394,5 +407,27 @@ cc_library(
         "@llvm-project//mlir:Support",
         "@llvm-project//mlir:TensorDialect",
         "@llvm-project//mlir:VectorDialect",
+    ],
+)
+
+cc_library(
+    name = "overlapping_slices_fusion",
+    srcs = ["overlapping_slices.cc"],
+    hdrs = ["overlapping_slices.h"],
+    deps = [
+        ":emitter_base",
+        "//xla/codegen/emitters:computation_partitioner",
+        "//xla/codegen/emitters:elemental_hlo_to_mlir",
+        "//xla/codegen/emitters/ir:xla",
+        "//xla/hlo/ir:hlo",
+        "//xla/service/gpu:hlo_fusion_analysis",
+        "//xla/service/gpu:ir_emission_utils",
+        "//xla/service/gpu:launch_dimensions",
+        "//xla/tsl/platform:errors",
+        "@com_google_absl//absl/status",
+        "@com_google_absl//absl/status:statusor",
+        "@llvm-project//mlir:IR",
+        "@llvm-project//mlir:FuncDialect",
+        "@llvm-project//mlir:TensorDialect",
     ],
 )
